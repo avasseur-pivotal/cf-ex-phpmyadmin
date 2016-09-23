@@ -1,3 +1,12 @@
+## This is a fork for offline use
+
+This example is a fork of https://github.com/cloudfoundry-samples/cf-ex-phpmyadmin
+and aim at running offline with no internet connection from the application deployed in PCF
+The PHPMyAdmin is packaged in this application.
+
+Documentation was also edited for Pivotal Cloud Foundry MySQL service (p-mysql)
+
+
 ## CloudFoundry PHP Example Application:  PHPMyAdmin
 
 This is an example application which can be run on CloudFoundry using the [PHP Build Pack].
@@ -9,15 +18,24 @@ This is an out-of-the-box implementation of PHPMyAdmin 4.2.2.  It's an example h
 1. Clone the app (i.e. this repo).
 
   ```bash
-  git clone https://github.com/cloudfoundry-samples/cf-ex-phpmyadmin
+  git clone https://github.com/avasseur-pivotal/cf-ex-phpmyadmin
   cd cf-ex-phpmyadmin
   ```
 
-1. If you don't have one already, create a MySQL service.  With Pivotal Web Services, the following command will create a free MySQL database through [ClearDb].
+1. If you don't have one already, create a MySQL service.
+
 
   ```bash
-  cf create-service cleardb spark mysql
+  cf create-service p-mysql 100mb mysql
   ```
+
+Else edit the manifest.yml to link to MySQL service instance that already exists in your space.
+```bash
+cf services
+...
+edit manifest.yml for the mysql you want to connect to
+```
+
 
 1. Push it to CloudFoundry.
 
@@ -30,6 +48,8 @@ This is an out-of-the-box implementation of PHPMyAdmin 4.2.2.  It's an example h
   ```bash
   cf env <app-name>
   ```
+or use the AppsManager service credential section on the application page and service tab.
+
 
 ### How It Works
 
@@ -38,6 +58,7 @@ When you push the application here's what happens.
 1. The local bits are pushed to your target.  This is small, six files around 30k. It includes the changes we made and a build pack extension for PHPMyAdmin.
 1. The server downloads the [PHP Build Pack] and runs it.  This installs HTTPD and PHP.
 1. The build pack sees the extension that we pushed and runs it.  The extension downloads the stock PHPMyAdmin file from their server, unzips it and installs it into the `htdocs` directory.  It then copies the rest of the files that we pushed and replaces the default PHPMyAdmin files with them.  In this case, it's just the `config.inc.php` file.
+Note that the phpMyAdmin is packaged in this app to work offline without internet access.
 1. At this point, the build pack is done and CF runs our droplet.
 
 ### Changes
@@ -51,4 +72,3 @@ These changes were made to prepare it to run on CloudFoundry:
 5. Increased the timeout of the session by setting 'LoginCookieValidity' and 'session.gc_maxlifetime' to 1800.  Link to [change #1](https://github.com/cloudfoundry-samples/cf-ex-phpmyadmin/blob/master/htdocs/config.inc.php#L56) and [change #2](https://github.com/cloudfoundry-samples/cf-ex-phpmyadmin/blob/master/.bp-config/php/php.ini#L1443).
 
 [PHP Buildpack]:https://github.com/cloudfoundry/php-buildpack
-[ClearDb]:https://www.cleardb.com/

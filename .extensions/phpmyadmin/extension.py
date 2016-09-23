@@ -11,6 +11,8 @@ from build_pack_utils import utils
 _log = logging.getLogger('phpmyadmin')
 
 
+### MODIFIED to have tgz locally for offline use
+
 DEFAULTS = utils.FormattedDict({
     'PHPMYADMIN_VERSION': '4.4.11',
     'PHPMYADMIN_PACKAGE': 'phpMyAdmin-{PHPMYADMIN_VERSION}-english.tar.gz',
@@ -39,7 +41,9 @@ def compile(install):
     inst = install._installer
     workDir = os.path.join(ctx['TMPDIR'], 'phpmyadmin')
     inst.install_binary_direct(
-        DEFAULTS['PHPMYADMIN_URL'],
+	## MODIFIED FOR OFFLINE USE
+	## note that variable expansion does not work here - https://github.com/cloudfoundry-samples/cf-ex-phpmyadmin/issues/6
+        "file://%s/%s" % (ctx['BUILD_DIR'], DEFAULTS['PHPMYADMIN_PACKAGE']),
         DEFAULTS['PHPMYADMIN_HASH'],
         workDir,
         fileName=DEFAULTS['PHPMYADMIN_PACKAGE'],
